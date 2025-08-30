@@ -1,19 +1,16 @@
-# INCLUDE HEADER FILES
-set(HEADER_FILES ${CMAKE_SOURCE_DIR}/src/headers/grid.h)
+add_library(src)
 
-# INCLUDE SOURCE FILES
-set(SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/main.c
-                 ${CMAKE_SOURCE_DIR}/src/grid.c)
+set(HEADERS
+    # ${CMAKE_SOURCE_DIR}/src/.h
+)
 
-# ADD EXECUTABLE OUTPUT FILE
-add_executable(main ${HEADER_FILES} ${SOURCE_FILES})
+set(SOURCES 
+    ${CMAKE_SOURCE_DIR}/src/grid.c
+)
 
-set_target_properties(main
-    PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY            "${CMAKE_SOURCE_DIR}/build"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${CMAKE_SOURCE_DIR}/build"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${CMAKE_SOURCE_DIR}/build")
+target_sources(src PRIVATE ${SOURCES} PUBLIC ${HEADERS})
+target_include_directories(src PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 # LINK SDL3 LIBRARY
 find_package(SDL3 CONFIG REQUIRED)
-target_link_libraries(main PRIVATE SDL3::SDL3)
+target_link_libraries(src PRIVATE SDL3::SDL3)
