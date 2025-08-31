@@ -1,7 +1,5 @@
 #include <SDL3/SDL.h>
-
-const int GRID_SQUARE_SIZE = 32;
-const int GRID_PADDING_SIZE = 32;
+#include <headers/grid.h>
 
 void DrawGrid(SDL_Renderer *renderer, float window_width, float window_height) {
     SDL_SetRenderDrawColor(renderer, 200, 200, 200, SDL_ALPHA_OPAQUE_FLOAT);

@@ -7,10 +7,13 @@ project(pathfinding)
 set(C_STANDARD 23)
 set(C_STANDARD_REQUIRED 23)
 
+# CREATE EXECUTABLE
 add_executable(main ${CMAKE_SOURCE_DIR}/main.c)
 
-add_subdirectory(src)
-target_link_libraries(main PRIVATE src)
+# INCLUDE LOCAL SOURCE/HEADERS FILES
+target_include_directories(main
+    PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/src/)
 
 # LINK SDL3 LIBRARY
 find_package(SDL3 CONFIG REQUIRED)
