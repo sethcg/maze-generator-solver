@@ -4,8 +4,8 @@
 #include <SDL3/SDL_main.h>
 #include <grid.c>
 
-const int WINDOW_WIDTH = 640;
-const int WINDOW_HEIGHT = 480;
+const int WINDOW_WIDTH = 520;
+const int WINDOW_HEIGHT = 520;
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;

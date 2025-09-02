@@ -1,5 +1,18 @@
 {
     "cmake.configureOnEdit": false,
     "cmake.configureOnOpen": false,
-    "cmake.cmakePath": "C:\\Program Files\\CMake\\bin\\cmake.exe"
+    "cmake.cmakePath": "C:\\Program Files\\CMake\\bin\\cmake.exe",
+    "files.associations": {
+        "cmath": "c",
+        "format": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "xstring": "c",
+        "xutility": "c",
+        "maze.h": "c",
+        "charconv": "c",
+        "xmemory": "c",
+        "math.h": "c",
+        "sdl.h": "c"
+    }
 }
