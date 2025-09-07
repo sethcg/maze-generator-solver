@@ -21,3 +21,4 @@ int* GenerateMaze(int arraySize) {
 
     return cells;
 }
+

@@ -25,7 +25,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
 
     // SET MINIMUM WINDOW SIZE
-    const int minimum_window_size = (GRID_PADDING_SIZE * 2) + (GRID_SQUARE_NUMBER * GRID_SQUARE_MINIMUM_SIZE);
+    const int minimum_window_size = (GRID_PADDING_MINIMUM_SIZE * 2) 
+        + (GRID_SQUARE_NUMBER * GRID_SQUARE_MINIMUM_SIZE)
+        + (GRID_SQUARE_NUMBER * GRID_BORDER_SIZE);
     SDL_SetWindowMinimumSize(window, minimum_window_size, minimum_window_size);
 
     // DRAW GRID
