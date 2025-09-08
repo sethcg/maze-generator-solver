@@ -8,6 +8,15 @@
         "xlocmon": "c",
         "xtr1common": "c",
         "xutility": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "xiosbase": "c",
+        "xlocale": "c",
+        "atomic": "c",
+        "charconv": "c",
+        "xmemory": "c",
+        "format": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "xstring": "c"
     }
 }
