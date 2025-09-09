@@ -22,8 +22,13 @@ typedef struct {
     int start_x;    // TOP-LEFT X COORDINATE
     int start_y;    // TOP-LEFT Y COORDINATE
     int size;
+    int borders;    // INT/BIT VALUE REPRESENTING NORTH, SOUTH, EAST, WEST
     bool visited;
 } cell;
 
-void DrawBorder(SDL_Renderer *renderer, cell* cells, int x, int y, direction dir);
+void DrawMaze(SDL_Renderer *renderer, cell* cells);
+void Walk(cell* cells);
+void ToggleBorder(int index, cell* cells, direction dir);
+
+void DrawBorder(SDL_Renderer *renderer, cell* cells, int x, int y);
 void DrawSquare(SDL_Renderer *renderer, cell* cells, int x, int y);

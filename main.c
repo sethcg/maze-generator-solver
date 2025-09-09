@@ -30,7 +30,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     // Create/Draw Grid
     cells = CreateGrid(renderer, window_width, window_height);
-    DrawGrid(renderer, cells);
+
+    DrawMaze(renderer, cells);
+
     SDL_RenderPresent(renderer);
 
     return SDL_APP_CONTINUE;
@@ -55,5 +57,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 // THIS FUNCTION RUNS ONCE AT SHUTDOWN
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
+    free(cells);
     // SDL CLEANS UP WINDOW/RENDERER AUTO-MAGICALLY
 }
