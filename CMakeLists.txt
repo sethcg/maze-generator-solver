@@ -1,20 +1,23 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 # SET PROJECT NAME
-project(pathfinding)
+project(maze-generation)
 
 # SET C LANGUAGE STANDARD
-set(C_STANDARD 23)
-set(C_STANDARD_REQUIRED 23)
+set(C_STANDARD 17)
+set(C_STANDARD_REQUIRED 17)
+
+# LINK SDL3 LIBRARY (TO ENTIRE PROJECT)
+find_package(SDL3 CONFIG REQUIRED)
+link_libraries(SDL3::SDL3)
+
+# ADD COMMON DIRECTORY
+add_subdirectory(common)
 
 # CREATE EXECUTABLE
-add_executable(main ${CMAKE_SOURCE_DIR}/main.c)
+add_executable(main ./main.c)
 
-# INCLUDE LOCAL SOURCE/HEADERS FILES
-target_include_directories(main
-    PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/src/)
+target_include_directories(common INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# LINK SDL3 LIBRARY
-find_package(SDL3 CONFIG REQUIRED)
-target_link_libraries(main PRIVATE SDL3::SDL3)
+# LINK COMMON TO MAIN FILE
+target_link_libraries(main common)

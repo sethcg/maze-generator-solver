@@ -3,7 +3,7 @@
         {
             "name": "Windows",
             "includePath": [
-                "${workspaceFolder}\\src\\**",
+                "${workspaceFolder}\\common\\include\\**",
                 "${workspaceFolder}\\build\\vcpkg_installed\\x64-windows\\include\\**"
             ],
             "defines": [
@@ -12,8 +12,8 @@
                 "_DEBUG"
             ],
             "compilerPath": "cl.exe",
-            "cStandard": "c23",
-            "cppStandard": "c++23",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
             "intelliSenseMode": "windows-msvc-x64",
             "configurationProvider": "ms-vscode.cmake-tools"
         }

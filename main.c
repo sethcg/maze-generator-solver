@@ -1,9 +1,9 @@
 #define SDL_MAIN_USE_CALLBACKS 1 // USE CALLBACKS INSTEAD OF THE "main()" FUNCTION
 
+#include <stdlib.h>
+#include <Grid.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <headers/grid.h>
-#include <grid.c>
 
 static int window_width = 840;
 static int window_height = 840;
@@ -25,14 +25,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
-    
-    SetBackground(renderer);
 
-    // Create/Draw Grid
-    cells = CreateGrid(renderer, window_width, window_height);
+    // INITIALIZE GRID
+    if(cells == NULL) {
+        cells = malloc((GRID_ROWS * GRID_COLUMNS) * sizeof(cell));
+        CreateGrid(renderer, cells, window_width, window_height);
+    }
 
     DrawMaze(renderer, cells);
-
     SDL_RenderPresent(renderer);
 
     return SDL_APP_CONTINUE;
