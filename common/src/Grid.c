@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
-#include <SDL3/SDL.h>
+
+#include <Cell.h>
 #include <Grid.h>
+#include <SDL3/SDL.h>
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -64,7 +66,6 @@ void DrawMaze(SDL_Renderer *renderer, cell* cells) {
     }
 
     // CHOOSE A RANDOM STARTING CELL, MARK VISITED
-    srand(time(NULL));
     int start_index = rand() % (GRID_ROWS * GRID_COLUMNS);
     cells[start_index].visited = true;
 
@@ -95,7 +96,6 @@ int Walk(int remaining, cell* cells) {
     }
 
     // PICK RANDOM UNVISITED CELL TO START FROM
-    srand(time(NULL));
     int current_index = unvisited_indices[rand() % (remaining)];
 
     int indices[array_size_max];
@@ -112,8 +112,7 @@ int Walk(int remaining, cell* cells) {
         // SELECT A RANDOM NEIGHBOR TO WALK TOWARDS
         int next_index = GetRandomNeighbor(current_index, array_size_max, cells);
 
-        bool makes_loop = contains(next_index, array_size_max, indices);
-        if(makes_loop) {
+        if(contains(next_index, array_size_max, indices)) {
             for(int i = 0; i < array_size_max; i++) {
                 if(indices[i] == next_index) {
                     running_index = i;
@@ -127,10 +126,10 @@ int Walk(int remaining, cell* cells) {
         } else {
             // ADD DIRECTION FROM CURRENT TO NEXT
             directions[running_index] = 
-                next_index == (current_index + 1) ? South :
-                next_index == (current_index - 1) ? North :
-                next_index == (current_index - GRID_ROWS) ? West :
-                next_index == (current_index + GRID_ROWS) ? East : None;
+                next_index == (current_index + 1) ? Down :
+                next_index == (current_index - 1) ? Up :
+                next_index == (current_index - GRID_ROWS) ? Left :
+                next_index == (current_index + GRID_ROWS) ? Right : None;
             running_index++;
         }
 
@@ -143,27 +142,25 @@ int Walk(int remaining, cell* cells) {
 
         int current = indices[i];
         int next = 
-            dir == North ? (current - 1) :
-            dir == South ? (current + 1) :
-            dir == East ? (current + GRID_ROWS) :
-            dir == West ? (current - GRID_ROWS) : -1;
+            dir == Up ? (current - 1) :
+            dir == Down ? (current + 1) :
+            dir == Right ? (current + GRID_ROWS) :
+            dir == Left ? (current - GRID_ROWS) : -1;
 
         // MARK CURRENT AS VISITED
         cells[current].visited = true;
 
-        // APPLY BORDER CHANGES, TO CURRENT AND NEXT
-        cells[current].borders = 
-            dir == North ? cells[current].borders ^ (1 << 0) :
-            dir == South ? cells[current].borders ^ (1 << 1) :
-            dir == West ? cells[current].borders ^ (1 << 2) :
-            dir == East ? cells[current].borders ^ (1 << 3) : cells[current].borders;
-        
-        // APPLY OPPOSITE TO THE NEXT BORDER
+        // APPLY BORDER CHANGES TO CURRENT CELL
+        cells[current].borders = dir == None 
+            ? cells[current].borders
+            : cells[current].borders ^ (1 << ((int) dir));
+
+        // APPLY OPPOSITE BORDER CHANGES TO THE NEXT CELL
         cells[next].borders = 
-            dir == South ? cells[next].borders ^ (1 << 0) :
-            dir == North ? cells[next].borders ^ (1 << 1) :
-            dir == East ? cells[next].borders ^ (1 << 2) :
-            dir == West ? cells[next].borders ^ (1 << 3) : cells[next].borders;
+            dir == Up ? cells[next].borders ^ (1 << Down) :
+            dir == Down ? cells[next].borders ^ (1 << Up) :
+            dir == Right ? cells[next].borders ^ (1 << Left) :
+            dir == Left ? cells[next].borders ^ (1 << Right) : cells[next].borders;
 
         current = next;
         remaining--;
@@ -208,7 +205,6 @@ int GetRandomNeighbor(int current_index, int array_size, cell* cells) {
     }
 
     // PICK RANDOM DIRECTION, FROM AVAILABLE
-    srand(time(NULL));
     int random_index = rand() % (neighbor_num);
     return neighbor_indices[random_index];
 }
@@ -220,53 +216,53 @@ void DrawBorder(SDL_Renderer *renderer, cell* cells, int x, int y) {
     const int start_x = cells[(x * GRID_COLUMNS) + y].start_x;
     const int start_y = cells[(x * GRID_COLUMNS) + y].start_y;
 
-    // NORTH
-    const int n_bit = borders & (1 << 0);
-    const int n_color = n_bit == 0 ? grid_color : 0;
-    const SDL_FRect north = { 
-        .x = n_bit == 0 ? start_x + GRID_CELL_BORDER_SIZE : start_x, 
+    // Up
+    const int up_bit = borders & (1 << 0);
+    const int up_color = up_bit == 0 ? grid_color : 0;
+    const SDL_FRect top_edge = { 
+        .x = up_bit == 0 ? start_x + GRID_CELL_BORDER_SIZE : start_x, 
         .y = start_y, 
         .w = cell_size,
         .h = GRID_CELL_BORDER_SIZE 
     };
-    SDL_SetRenderDrawColor(renderer, n_color, n_color, n_color, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_RenderFillRect(renderer, &north);
+    SDL_SetRenderDrawColor(renderer, up_color, up_color, up_color, SDL_ALPHA_OPAQUE_FLOAT);
+    SDL_RenderFillRect(renderer, &top_edge);
 
-    // SOUTH
-    const int s_bit = borders & (1 << 1);
-    const int s_color = s_bit == 0 ? grid_color : 0;
-    const SDL_FRect south = { 
-        .x = s_bit == 0 ? start_x + GRID_CELL_BORDER_SIZE : start_x,
+    // Down
+    const int down_bit = borders & (1 << 1);
+    const int down_color = down_bit == 0 ? grid_color : 0;
+    const SDL_FRect bottom_edge = { 
+        .x = down_bit == 0 ? start_x + GRID_CELL_BORDER_SIZE : start_x,
         .y = start_y + cell_size,
         .w = cell_size,
         .h = GRID_CELL_BORDER_SIZE 
     };
-    SDL_SetRenderDrawColor(renderer, s_color, s_color, s_color, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_RenderFillRect(renderer, &south);
+    SDL_SetRenderDrawColor(renderer, down_color, down_color, down_color, SDL_ALPHA_OPAQUE_FLOAT);
+    SDL_RenderFillRect(renderer, &bottom_edge);
 
-    // EAST
-    const int e_bit = borders & (1 << 2);
-    const int e_color = e_bit == 0 ? grid_color : 0;
-    const SDL_FRect east = { 
+    // Right
+    const int right_bit = borders & (1 << 2);
+    const int right_color = right_bit == 0 ? grid_color : 0;
+    const SDL_FRect right_edge = { 
         .x = start_x,
-        .y = e_bit == 0 ? start_y + GRID_CELL_BORDER_SIZE : start_y, 
+        .y = right_bit == 0 ? start_y + GRID_CELL_BORDER_SIZE : start_y, 
         .w = GRID_CELL_BORDER_SIZE,
         .h = cell_size,
     };
-    SDL_SetRenderDrawColor(renderer, e_color, e_color, e_color, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_RenderFillRect(renderer, &east);
+    SDL_SetRenderDrawColor(renderer, right_color, right_color, right_color, SDL_ALPHA_OPAQUE_FLOAT);
+    SDL_RenderFillRect(renderer, &right_edge);
 
-    // WEST
-    const int w_bit = borders & (1 << 3);
-    const int w_color = w_bit == 0 ? grid_color : 0;
-    const SDL_FRect west = { 
+    // Left
+    const int left_bit = borders & (1 << 3);
+    const int left_color = left_bit == 0 ? grid_color : 0;
+    const SDL_FRect left_edge = { 
         .x = start_x + cell_size, 
-        .y = w_bit == 0 ? start_y + GRID_CELL_BORDER_SIZE : start_y, 
+        .y = left_bit == 0 ? start_y + GRID_CELL_BORDER_SIZE : start_y, 
         .w = GRID_CELL_BORDER_SIZE, 
         .h = cell_size,
     };
-    SDL_SetRenderDrawColor(renderer, w_color, w_color, w_color, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_RenderFillRect(renderer, &west);
+    SDL_SetRenderDrawColor(renderer, left_color, left_color, left_color, SDL_ALPHA_OPAQUE_FLOAT);
+    SDL_RenderFillRect(renderer, &left_edge);
 }
 
 void DrawSquare(SDL_Renderer *renderer, cell* cells, int x, int y) {

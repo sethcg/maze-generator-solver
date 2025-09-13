@@ -1,6 +1,7 @@
 #define SDL_MAIN_USE_CALLBACKS 1 // USE CALLBACKS INSTEAD OF THE "main()" FUNCTION
 
 #include <stdlib.h>
+#include <time.h>
 #include <Grid.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -31,6 +32,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         cells = malloc((GRID_ROWS * GRID_COLUMNS) * sizeof(cell));
         CreateGrid(renderer, cells, window_width, window_height);
     }
+
+    // SET RANDOM SEED
+    srand(time(NULL));
 
     DrawMaze(renderer, cells);
     SDL_RenderPresent(renderer);
