@@ -15,22 +15,25 @@ void SetBackground(SDL_Renderer *renderer) {
 }
 
 void CreateGrid(SDL_Renderer *renderer, cell* cells, int window_width, int window_height) {
-    const int cell_total_size = GRID_CELL_SIZE + (GRID_CELL_BORDER_SIZE * 2);
+    const int total_size = GRID_CELL_SIZE + (GRID_CELL_BORDER_SIZE * 2);
     for (int x = 0; x < GRID_ROWS; x++) {
         for (int y = 0; y < GRID_COLUMNS; y++) {
-            cells[(x * GRID_COLUMNS) + y].index = (x * GRID_COLUMNS) + y;
-            cells[(x * GRID_COLUMNS) + y].start_x = GRID_PADDING_SIZE + (x * cell_total_size);
-            cells[(x * GRID_COLUMNS) + y].start_y = GRID_PADDING_SIZE + (y * cell_total_size);
-            cells[(x * GRID_COLUMNS) + y].size = cell_total_size;
-            cells[(x * GRID_COLUMNS) + y].visited = false;
+            // MAKE DEFAULT CELL
+            cell cell = create_cell();
 
-            // SET ALL BORDER BITS TO "TRUE"
-            cells[(x * GRID_COLUMNS) + y].borders = 0b1111;
+            // ADD DYNAMIC DATA TO CELL (INDEX, SIZE, ...)
+            int index = (x * GRID_COLUMNS) + y;
+            cell.index = (x * GRID_COLUMNS) + y;
+            cell.start_x = GRID_PADDING_SIZE + (x * total_size);
+            cell.start_y = GRID_PADDING_SIZE + (y * total_size);
+            cell.size = total_size;
 
-            // ADD BORDERS
+            cells[index] = cell;
+
+            // DRAW CELL BORDERS AT (X, Y) COORDINATES
             DrawBorder(renderer, cells, x, y);
 
-            // ADD SQUARE
+            // DRAW CELL SQUARE AT (X, Y) COORDINATES
             SDL_SetRenderDrawColor(renderer, 50, 50, 50, SDL_ALPHA_OPAQUE_FLOAT);
             DrawSquare(renderer, cells, x, y);
         }
@@ -38,20 +41,21 @@ void CreateGrid(SDL_Renderer *renderer, cell* cells, int window_width, int windo
 }
 
 void DrawGrid(SDL_Renderer *renderer, cell* cells) {
+    // DRAW BACKGROUND COLOR
     SetBackground(renderer);
 
     for (int x = 0; x < GRID_ROWS; x++) {
         for (int y = 0; y < GRID_COLUMNS; y++) {
-
-            // ADD BORDERS
+            // DRAW CELL BORDERS AT (X, Y) COORDINATES
             DrawBorder(renderer, cells, x, y);
 
-            // ADD SQUARE
+            // DRAW CELL SQUARE AT (X, Y) COORDINATES
             SDL_SetRenderDrawColor(renderer, 50, 50, 50, SDL_ALPHA_OPAQUE_FLOAT);
             DrawSquare(renderer, cells, x, y);
         }
     }
 
+    // UPDATE SCREEN RENDERING
     SDL_RenderPresent(renderer);
     return;
 }

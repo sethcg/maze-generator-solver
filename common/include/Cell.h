@@ -19,4 +19,6 @@ typedef struct {
     direction dir;
 } cell;
 
+#define create_cell() { .visited = false, .dir = None , .borders = 0b1111 };
+
 #endif

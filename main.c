@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include <Grid.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <Grid.h>
 
 static int window_width = 840;
 static int window_height = 840;
@@ -36,9 +36,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     // SET RANDOM SEED
     srand(time(NULL));
 
+    // GENERATE MAZE
     DrawMaze(renderer, cells);
-    SDL_RenderPresent(renderer);
-
+    
     return SDL_APP_CONTINUE;
 }
 
