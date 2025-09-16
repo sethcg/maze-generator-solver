@@ -6,14 +6,13 @@
 
 // CALCULATE THE GRID NUMBERS:
 // (WINDOW_WIDTH - (GRID_PADDING_SIZE * 2)) / (GRID_CELL_SIZE + (GRID_CELL_BORDER_SIZE * 2))
+#define GRID_ROWS 25
+#define GRID_COLUMNS 25
 
-static const int GRID_ROWS = 25;
-static const int GRID_COLUMNS = 25;
+#define GRID_PADDING_SIZE 20
 
-static const int GRID_PADDING_SIZE = 20;
-
-static const int GRID_CELL_SIZE = 28;
-static const int GRID_CELL_BORDER_SIZE = 2;
+#define GRID_CELL_SIZE 28
+#define GRID_CELL_BORDER_SIZE 2
 
 void CreateGrid(SDL_Renderer *renderer, cell* cells, int window_width, int window_height);
 

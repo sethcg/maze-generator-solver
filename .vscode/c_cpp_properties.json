@@ -3,7 +3,7 @@
         {
             "name": "Windows",
             "includePath": [
-                "${workspaceFolder}\\common\\include\\**",
+                "${workspaceFolder}\\core\\include\\**",
                 "${workspaceFolder}\\build\\vcpkg_installed\\x64-windows\\include\\**"
             ],
             "defines": [

@@ -9,15 +9,18 @@ set(C_STANDARD_REQUIRED 17)
 
 # LINK SDL3 LIBRARY (TO ENTIRE PROJECT)
 find_package(SDL3 CONFIG REQUIRED)
-link_libraries(SDL3::SDL3)
 
-# ADD COMMON DIRECTORY
-add_subdirectory(common)
+# ADD CORE DIRECTORY
+add_subdirectory(core)
 
 # CREATE EXECUTABLE
 add_executable(main ./main.c)
 
-target_include_directories(common INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+# INCLUDE CORE TO TARGET
+target_include_directories(core INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# LINK COMMON TO MAIN FILE
-target_link_libraries(main common)
+# LINK LIBARIES TO TARGET
+target_link_libraries(main PRIVATE 
+    core
+    SDL3::SDL3
+)
