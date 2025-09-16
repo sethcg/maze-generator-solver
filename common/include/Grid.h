@@ -7,8 +7,8 @@
 // CALCULATE THE GRID NUMBERS:
 // (WINDOW_WIDTH - (GRID_PADDING_SIZE * 2)) / (GRID_CELL_SIZE + (GRID_CELL_BORDER_SIZE * 2))
 
-static const int GRID_ROWS = 8;
-static const int GRID_COLUMNS = 8;
+static const int GRID_ROWS = 25;
+static const int GRID_COLUMNS = 25;
 
 static const int GRID_PADDING_SIZE = 20;
 

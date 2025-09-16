@@ -160,11 +160,19 @@ int Walk(int remaining, cell* cells) {
             : cells[current].borders ^ (1 << ((int) dir));
 
         // APPLY OPPOSITE BORDER CHANGES TO THE NEXT CELL
-        cells[next].borders = 
-            dir == Up ? cells[next].borders ^ (1 << Down) :
-            dir == Down ? cells[next].borders ^ (1 << Up) :
-            dir == Right ? cells[next].borders ^ (1 << Left) :
-            dir == Left ? cells[next].borders ^ (1 << Right) : cells[next].borders;
+        if(cells[index].borders & (1 << ((int) dir)) == 0) {
+            cells[next].borders = 
+                dir == Up ? cells[next].borders | (1 << Down) :
+                dir == Down ? cells[next].borders | (1 << Up) :
+                dir == Right ? cells[next].borders | (1 << Left) :
+                dir == Left ? cells[next].borders | (1 << Right) : cells[next].borders;
+        } else {
+            cells[next].borders = 
+                dir == Up ? cells[next].borders & ~(1 << Down) :
+                dir == Down ? cells[next].borders & ~(1 << Up) :
+                dir == Right ? cells[next].borders & ~(1 << Left) :
+                dir == Left ? cells[next].borders & ~(1 << Right) : cells[next].borders;
+        }
 
         current = next;
         remaining--;
@@ -220,53 +228,53 @@ void DrawBorder(SDL_Renderer *renderer, cell* cells, int x, int y) {
     const int start_x = cells[(x * GRID_COLUMNS) + y].start_x;
     const int start_y = cells[(x * GRID_COLUMNS) + y].start_y;
 
-    // Up
-    const int up_bit = borders & (1 << 0);
-    const int up_color = up_bit == 0 ? grid_color : 0;
+    // Top Edge
+    const int top_bit = borders & (1 << Up);
+    const int top_color = top_bit == 0 ? grid_color : 0;
     const SDL_FRect top_edge = { 
-        .x = up_bit == 0 ? start_x + GRID_CELL_BORDER_SIZE : start_x, 
+        .x = top_bit == 0 ? start_x + GRID_CELL_BORDER_SIZE : start_x, 
         .y = start_y, 
         .w = cell_size,
         .h = GRID_CELL_BORDER_SIZE 
     };
-    SDL_SetRenderDrawColor(renderer, up_color, up_color, up_color, SDL_ALPHA_OPAQUE_FLOAT);
+    SDL_SetRenderDrawColor(renderer, top_color, top_color, top_color, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_RenderFillRect(renderer, &top_edge);
 
-    // Down
-    const int down_bit = borders & (1 << 1);
-    const int down_color = down_bit == 0 ? grid_color : 0;
+    // Bottom Edge
+    const int bottom_bit = borders & (1 << Down);
+    const int bottom_color = bottom_bit == 0 ? grid_color : 0;
     const SDL_FRect bottom_edge = { 
-        .x = down_bit == 0 ? start_x + GRID_CELL_BORDER_SIZE : start_x,
+        .x = bottom_bit == 0 ? start_x + GRID_CELL_BORDER_SIZE : start_x,
         .y = start_y + cell_size,
-        .w = cell_size,
+        .w = bottom_bit == 0 ? cell_size : cell_size + GRID_CELL_BORDER_SIZE,
         .h = GRID_CELL_BORDER_SIZE 
     };
-    SDL_SetRenderDrawColor(renderer, down_color, down_color, down_color, SDL_ALPHA_OPAQUE_FLOAT);
+    SDL_SetRenderDrawColor(renderer, bottom_color, bottom_color, bottom_color, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_RenderFillRect(renderer, &bottom_edge);
 
-    // Right
-    const int right_bit = borders & (1 << 2);
-    const int right_color = right_bit == 0 ? grid_color : 0;
-    const SDL_FRect right_edge = { 
-        .x = start_x,
-        .y = right_bit == 0 ? start_y + GRID_CELL_BORDER_SIZE : start_y, 
-        .w = GRID_CELL_BORDER_SIZE,
-        .h = cell_size,
-    };
-    SDL_SetRenderDrawColor(renderer, right_color, right_color, right_color, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_RenderFillRect(renderer, &right_edge);
-
-    // Left
-    const int left_bit = borders & (1 << 3);
+    // Left Edge
+    const int left_bit = borders & (1 << Left);
     const int left_color = left_bit == 0 ? grid_color : 0;
     const SDL_FRect left_edge = { 
-        .x = start_x + cell_size, 
+        .x = start_x,
         .y = left_bit == 0 ? start_y + GRID_CELL_BORDER_SIZE : start_y, 
-        .w = GRID_CELL_BORDER_SIZE, 
-        .h = cell_size,
+        .w = GRID_CELL_BORDER_SIZE,
+        .h = left_bit == 0 ? cell_size - GRID_CELL_BORDER_SIZE : cell_size,
     };
     SDL_SetRenderDrawColor(renderer, left_color, left_color, left_color, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_RenderFillRect(renderer, &left_edge);
+
+    // Right Edge
+    const int right_bit = borders & (1 << Right);
+    const int right_color = right_bit == 0 ? grid_color : 0;
+    const SDL_FRect right_edge = { 
+        .x = start_x + cell_size, 
+        .y = right_bit == 0 ? start_y + GRID_CELL_BORDER_SIZE : start_y, 
+        .w = GRID_CELL_BORDER_SIZE, 
+        .h = right_bit == 0 ? cell_size - GRID_CELL_BORDER_SIZE : cell_size,
+    };
+    SDL_SetRenderDrawColor(renderer, right_color, right_color, right_color, SDL_ALPHA_OPAQUE_FLOAT);
+    SDL_RenderFillRect(renderer, &right_edge);
 }
 
 void DrawSquare(SDL_Renderer *renderer, cell* cells, int x, int y) {
