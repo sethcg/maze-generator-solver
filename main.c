@@ -4,8 +4,8 @@
 #include <time.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <grid.h>
-#include <wilson_maze.h>
+#include <Grid.h>
+#include <WilsonMaze.h>
 
 #define WINDOW_WIDTH 840
 #define WINDOW_HEIGHT 840
@@ -31,12 +31,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
 
     if(cells == NULL) {
-        cells = malloc((GRID_ROWS * GRID_COLUMNS) * sizeof(cell));
+        cells = malloc(GRID_ARRAY_SIZE * sizeof(cell));
     }
 
     // CREATE/DRAW MAZE
     CreateGrid(renderer, cells);
-    DrawMaze(renderer, cells);
+    Draw_WilsonMaze(renderer, cells);
     
     return SDL_APP_CONTINUE;
 }

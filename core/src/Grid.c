@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL3/SDL.h>
-#include <grid.h>
-#include <cell.h>
+#include <Grid.h>
+#include <Cell.h>
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))

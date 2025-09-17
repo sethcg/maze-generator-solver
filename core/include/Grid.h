@@ -2,7 +2,7 @@
 #define GRID_H
 
 #include <SDL3/SDL.h>
-#include <cell.h>
+#include <Cell.h>
 
 #define GRID_ROWS 25
 #define GRID_COLUMNS 25

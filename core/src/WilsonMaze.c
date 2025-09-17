@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL3/SDL.h>
-#include <grid.h>
-#include <cell.h>
-#include <wilson_maze.h>
+#include <Grid.h>
+#include <Cell.h>
+#include <WilsonMaze.h>
 
-void DrawMaze(SDL_Renderer *renderer, cell* cells) {
+void Draw_WilsonMaze(SDL_Renderer *renderer, cell* cells) {
     int* remaining = malloc(sizeof(int));
     int* unvisited = malloc(GRID_ARRAY_SIZE* sizeof(int));
     cell_direction* visited = malloc(GRID_ARRAY_SIZE * sizeof(cell_direction));
@@ -152,7 +152,7 @@ static void GetRandomNeighbor(int current_index, int* next_index, int* neighbors
     }
 
     // RIGHT EDGE
-    if((current_index + GRID_ROWS) <= GRID_ARRAY_SIZE) {
+    if((current_index + GRID_ROWS) < GRID_ARRAY_SIZE) {
         neighbors[neighbors_num] = (current_index + GRID_ROWS);
         neighbors_num++;
     }
