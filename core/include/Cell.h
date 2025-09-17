@@ -11,14 +11,13 @@ typedef enum {
 
 typedef struct {
     int index;
-    int start_x;    // TOP-LEFT X COORDINATE
-    int start_y;    // TOP-LEFT Y COORDINATE
+    int start_x;        // TOP-LEFT X COORDINATE
+    int start_y;        // TOP-LEFT Y COORDINATE
     int size;
-    int borders;    // INT/BIT VALUE REPRESENTING NORTH, SOUTH, EAST, WEST
+    uint8_t borders;    // FIRST 4-BITS: [UP, DOWN, RIGHT, LEFT]
     bool visited;
-    direction dir;
 } cell;
 
-#define create_cell() { .visited = false, .dir = None , .borders = 0b1111 };
+#define create_cell() { .visited = false, .borders = (uint8_t) 0b1111 };
 
 #endif
