@@ -1,2 +1,5 @@
 # BUILD FOLDER
 /build
+
+# IMGUI FILES
+*.ini

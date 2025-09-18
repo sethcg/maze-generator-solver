@@ -20,8 +20,6 @@ void CreateGrid(SDL_Renderer *renderer, cell* cells);
 
 void DrawGrid(SDL_Renderer *renderer, cell* cells);
 
-static void SetBackground(SDL_Renderer *renderer);
-
 static void DrawBorder(SDL_Renderer *renderer, cell* cells, int x, int y);
 
 static void DrawSquare(SDL_Renderer *renderer, cell* cells, int x, int y);

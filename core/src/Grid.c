@@ -9,7 +9,6 @@
 
 void CreateGrid(SDL_Renderer *renderer, cell* cells) {
     const int cell_size = GRID_CELL_SIZE + (GRID_CELL_BORDER_SIZE * 2);
-
     for (int x = 0; x < GRID_ROWS; x++) {
         for (int y = 0; y < GRID_COLUMNS; y++) {
             // MAKE DEFAULT CELL
@@ -35,9 +34,6 @@ void CreateGrid(SDL_Renderer *renderer, cell* cells) {
 }
 
 void DrawGrid(SDL_Renderer *renderer, cell* cells) {
-    // DRAW BACKGROUND COLOR
-    SetBackground(renderer);
-
     for (int x = 0; x < GRID_ROWS; x++) {
         for (int y = 0; y < GRID_COLUMNS; y++) {
             // DRAW CELL BORDERS
@@ -48,15 +44,6 @@ void DrawGrid(SDL_Renderer *renderer, cell* cells) {
             DrawSquare(renderer, cells, x, y);
         }
     }
-
-    // UPDATE SCREEN RENDERING
-    SDL_RenderPresent(renderer);
-    return;
-}
-
-static void SetBackground(SDL_Renderer *renderer) {
-    SDL_SetRenderDrawColor(renderer, 30, 30, 30, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_RenderClear(renderer);
 }
 
 static void DrawBorder(SDL_Renderer *renderer, cell* cells, int x, int y) {

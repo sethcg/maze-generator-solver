@@ -7,10 +7,12 @@
 #include <Cell.h>
 #include <WilsonMaze.h>
 
-void Draw_WilsonMaze(SDL_Renderer *renderer, cell* cells) {
-    int* remaining = malloc(sizeof(int));
-    int* unvisited = malloc(GRID_ARRAY_SIZE* sizeof(int));
-    cell_direction* visited = malloc(GRID_ARRAY_SIZE * sizeof(cell_direction));
+int* unvisited = NULL;
+cell_direction* visited = NULL;
+
+void Allocate_WilsonMaze(int* remaining, cell* cells) {
+    unvisited = malloc(GRID_ARRAY_SIZE * sizeof(int));
+    visited = malloc(GRID_ARRAY_SIZE * sizeof(cell_direction));
 
     // INITIALIZE GRID, WITH ALL BORDERS AND UNVISITED
     for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
@@ -23,19 +25,23 @@ void Draw_WilsonMaze(SDL_Renderer *renderer, cell* cells) {
 
     // RANDOMLY WALK WITH LOOP-ERASING
     *remaining = (int) (GRID_ARRAY_SIZE - 1);
-    while (*remaining > 0) {
-        Walk(remaining, unvisited, visited, cells);
+}
 
-        // DRAW GRID EACH ITERATION OF WALK
-        DrawGrid(renderer, cells);
-    }
+bool Iterate_WilsonMaze(int* remaining, SDL_Renderer* renderer, cell* cells) {
+    Walk(remaining, cells);
 
-    free(remaining);
+    // DRAW GRID EACH ITERATION OF WALK
+    // DrawGrid(renderer, cells);
+
+    return *remaining > 0;
+}
+
+void Free_WilsonMaze() {
     free(unvisited);
     free(visited);
 }
 
-static void Walk(int* remaining, int* unvisited, cell_direction* visited, cell* cells) {
+static void Walk(int* remaining, cell* cells) {
     int* neighbors = malloc(4 * sizeof(int));
     int* next_index = malloc(sizeof(int));
 
@@ -63,7 +69,7 @@ static void Walk(int* remaining, int* unvisited, cell_direction* visited, cell* 
         // SELECT A RANDOM NEIGHBOR TO WALK TOWARDS
         GetRandomNeighbor(current_index, next_index, neighbors, cells);
 
-        if(contains(*next_index, GRID_ARRAY_SIZE, visited)) {
+        if(contains(*next_index, GRID_ARRAY_SIZE)) {
             for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
                 if(visited[i].cell_index == *next_index) {
                     running_index = i;
@@ -161,7 +167,7 @@ static void GetRandomNeighbor(int current_index, int* next_index, int* neighbors
     *next_index = neighbors[rand() % (neighbors_num)];
 }
 
-static bool contains(int value, int array_size, cell_direction* visited) {
+static bool contains(int value, int array_size) {
     for(int i = 0; i < array_size; i++) {
         if(visited[i].cell_index == value) {
             return true;
