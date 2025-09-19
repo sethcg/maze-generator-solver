@@ -28,7 +28,7 @@ MazeContext* Init_WilsonMaze(cell* cells) {
     return mazeContext;
 }
 
-bool Continue_WilsonMaze(MazeContext* mazeContext, SDL_Renderer* renderer, cell* cells) {
+bool Continue_WilsonMaze(MazeContext* mazeContext, cell* cells) {
     Walk(mazeContext, cells);
     return (mazeContext->remaining > 0);
 }

@@ -20,7 +20,7 @@ typedef struct MazeContext {
 
 MazeContext* Init_WilsonMaze(cell* cells);
 
-bool Continue_WilsonMaze(MazeContext* mazeContext, SDL_Renderer* renderer, cell* cells);
+bool Continue_WilsonMaze(MazeContext* mazeContext, cell* cells);
 
 static void Walk(MazeContext* mazeContext, cell* cells);
 
