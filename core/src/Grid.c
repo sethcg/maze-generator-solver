@@ -34,6 +34,10 @@ void CreateGrid(SDL_Renderer *renderer, cell* cells) {
 }
 
 void DrawGrid(SDL_Renderer *renderer, cell* cells) {
+    // DRAW BACKGROUND COLOR
+    SDL_SetRenderDrawColor(renderer, 30, 30, 30, SDL_ALPHA_OPAQUE_FLOAT);
+    SDL_RenderClear(renderer);
+
     for (int x = 0; x < GRID_ROWS; x++) {
         for (int y = 0; y < GRID_COLUMNS; y++) {
             // DRAW CELL BORDERS

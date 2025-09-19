@@ -7,12 +7,11 @@
 #include <Cell.h>
 #include <WilsonMaze.h>
 
-int* unvisited = NULL;
-cell_direction* visited = NULL;
-
-void Allocate_WilsonMaze(int* remaining, cell* cells) {
-    unvisited = malloc(GRID_ARRAY_SIZE * sizeof(int));
-    visited = malloc(GRID_ARRAY_SIZE * sizeof(cell_direction));
+MazeContext* Init_WilsonMaze(cell* cells) {
+    MazeContext* mazeContext = (MazeContext*) malloc(sizeof(MazeContext));
+    mazeContext->unvisited = (int*) malloc(GRID_ARRAY_SIZE * sizeof(int));
+    mazeContext->visited = (cell_direction*) malloc(GRID_ARRAY_SIZE * sizeof(cell_direction));
+    mazeContext->neighbors = (int*) malloc(4 * sizeof(int));
 
     // INITIALIZE GRID, WITH ALL BORDERS AND UNVISITED
     for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
@@ -24,80 +23,71 @@ void Allocate_WilsonMaze(int* remaining, cell* cells) {
     cells[rand() % (GRID_ROWS * GRID_COLUMNS)].visited = true;
 
     // RANDOMLY WALK WITH LOOP-ERASING
-    *remaining = (int) (GRID_ARRAY_SIZE - 1);
+    mazeContext->remaining = (GRID_ARRAY_SIZE - 1);
+
+    return mazeContext;
 }
 
-bool Iterate_WilsonMaze(int* remaining, SDL_Renderer* renderer, cell* cells) {
-    Walk(remaining, cells);
-
-    // DRAW GRID EACH ITERATION OF WALK
-    // DrawGrid(renderer, cells);
-
-    return *remaining > 0;
+bool Continue_WilsonMaze(MazeContext* mazeContext, SDL_Renderer* renderer, cell* cells) {
+    Walk(mazeContext, cells);
+    return (mazeContext->remaining > 0);
 }
 
-void Free_WilsonMaze() {
-    free(unvisited);
-    free(visited);
-}
-
-static void Walk(int* remaining, cell* cells) {
-    int* neighbors = malloc(4 * sizeof(int));
-    int* next_index = malloc(sizeof(int));
-
+static void Walk(MazeContext* mazeContext, cell* cells) {
     // INITIALIZE ARRAYS
     int index = 0;
     for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
-        visited[i].cell_index = -1;
-        visited[i].dir = None;
+        mazeContext->visited[i].cell_index = -1;
+        mazeContext->visited[i].dir = None;
 
         if(cells[i].visited) {
-            unvisited[i] = -1;
+            mazeContext->unvisited[i] = -1;
         } else {
-            unvisited[index] = cells[i].index;
+            mazeContext->unvisited[index] = cells[i].index;
             index++;
         }
     }
 
     // PICK RANDOM UNVISITED CELL TO START FROM
-    int current_index = unvisited[rand() % (*remaining)];
+    mazeContext->current_index = mazeContext->unvisited[rand() % (mazeContext->remaining)];
 
     int running_index = 0;
-    while(!cells[current_index].visited) {
-        visited[running_index].cell_index = current_index;
+    while(!cells[mazeContext->current_index].visited) {
+        mazeContext->visited[running_index].cell_index = mazeContext->current_index;
 
         // SELECT A RANDOM NEIGHBOR TO WALK TOWARDS
-        GetRandomNeighbor(current_index, next_index, neighbors, cells);
+        GetRandomNeighbor(mazeContext, cells);
 
-        if(contains(*next_index, GRID_ARRAY_SIZE)) {
+        // IF THE PATH CONTAINS LOOP, ERASE THE LOOP
+        if(ContainsLoop(mazeContext)) {
             for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
-                if(visited[i].cell_index == *next_index) {
+                if(mazeContext->visited[i].cell_index == mazeContext->next_index) {
                     running_index = i;
                     break;
                 }
             }
             for(int i = running_index + 1; i < GRID_ARRAY_SIZE; i++) {
-                visited[i].cell_index = -1;
-                visited[i].dir = None;
+                mazeContext->visited[i].cell_index = -1;
+                mazeContext->visited[i].dir = None;
             }
         } else {
             // ADD DIRECTION FROM CURRENT TO NEXT
-            visited[running_index].dir = 
-                *next_index == (current_index + 1) ? Down :
-                *next_index == (current_index - 1) ? Up :
-                *next_index == (current_index - GRID_ROWS) ? Left :
-                *next_index == (current_index + GRID_ROWS) ? Right : None;
+            mazeContext->visited[running_index].dir = 
+                mazeContext->next_index == (mazeContext->current_index + 1) ? Down :
+                mazeContext->next_index == (mazeContext->current_index - 1) ? Up :
+                mazeContext->next_index == (mazeContext->current_index - GRID_ROWS) ? Left :
+                mazeContext->next_index == (mazeContext->current_index + GRID_ROWS) ? Right : None;
             running_index++;
         }
 
-        current_index = *next_index;
+        mazeContext->current_index = mazeContext->next_index;
     }
 
     // APPLY THE PATH
     for(int i = 0; i < running_index; i++) {
-        direction dir = visited[i].dir;
+        direction dir = mazeContext->visited[i].dir;
 
-        int current = visited[i].cell_index;
+        int current = mazeContext->visited[i].cell_index;
         int next = 
             dir == Up ? (current - 1) :
             dir == Down ? (current + 1) :
@@ -128,51 +118,47 @@ static void Walk(int* remaining, cell* cells) {
         }
 
         current = next;
-        *remaining = *remaining - 1;
+        mazeContext->remaining = mazeContext->remaining - 1;
     }
-
-    free(neighbors);
-    free(next_index);
 }
 
-static void GetRandomNeighbor(int current_index, int* next_index, int* neighbors, cell* cells) {
-    memset(neighbors, 0, 4 * sizeof (int));
-    int neighbors_num = 0;
+static void GetRandomNeighbor(MazeContext* mazeContext, cell* cells) {
+    int array_size = 0;
+    memset(mazeContext->neighbors, 0, 4 * sizeof (int));
 
     // TOP EDGE
-    if(current_index % GRID_ROWS != 0) {
-        neighbors[neighbors_num] = (current_index - 1);
-        neighbors_num++;
+    if(mazeContext->current_index % GRID_ROWS != 0) {
+        mazeContext->neighbors[array_size] = (mazeContext->current_index - 1);
+        array_size++;
     }
 
     // BOTTOM EDGE
-    if((current_index + 1) % GRID_ROWS != 0) {
-        neighbors[neighbors_num] = (current_index + 1);
-        neighbors_num++;
+    if((mazeContext->current_index + 1) % GRID_ROWS != 0) {
+        mazeContext->neighbors[array_size] = (mazeContext->current_index + 1);
+        array_size++;
     }
 
     // LEFT EDGE
-    if(current_index > GRID_ROWS) {
-        neighbors[neighbors_num] = (current_index - GRID_ROWS);
-        neighbors_num++;
+    if(mazeContext->current_index > GRID_ROWS) {
+        mazeContext->neighbors[array_size] = (mazeContext->current_index - GRID_ROWS);
+        array_size++;
     }
 
     // RIGHT EDGE
-    if((current_index + GRID_ROWS) < GRID_ARRAY_SIZE) {
-        neighbors[neighbors_num] = (current_index + GRID_ROWS);
-        neighbors_num++;
+    if((mazeContext->current_index + GRID_ROWS) < GRID_ARRAY_SIZE) {
+        mazeContext->neighbors[array_size] = (mazeContext->current_index + GRID_ROWS);
+        array_size++;
     }
 
     // PICK RANDOM DIRECTION, FROM AVAILABLE
-    *next_index = neighbors[rand() % (neighbors_num)];
+    mazeContext->next_index = mazeContext->neighbors[rand() % (array_size)];
 }
 
-static bool contains(int value, int array_size) {
-    for(int i = 0; i < array_size; i++) {
-        if(visited[i].cell_index == value) {
+static bool ContainsLoop(MazeContext* mazeContext) {
+    for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
+        if(mazeContext->visited[i].cell_index == mazeContext->next_index) {
             return true;
         }
     }
     return false;
 }
-

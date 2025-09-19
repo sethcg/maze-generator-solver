@@ -9,16 +9,23 @@ typedef struct {
     direction dir;
 } cell_direction;
 
-void Allocate_WilsonMaze(int* remaining, cell* cells);
+typedef struct MazeContext {
+    int remaining;
+    int current_index;
+    int next_index;
+    int* neighbors;
+    int* unvisited;
+    cell_direction* visited;
+} MazeContext;
 
-bool Iterate_WilsonMaze(int* remaining, SDL_Renderer* renderer, cell* cells);
+MazeContext* Init_WilsonMaze(cell* cells);
 
-void Free_WilsonMaze();
+bool Continue_WilsonMaze(MazeContext* mazeContext, SDL_Renderer* renderer, cell* cells);
 
-static void Walk(int* remaining, cell* cells);
+static void Walk(MazeContext* mazeContext, cell* cells);
 
-static void GetRandomNeighbor(int current_index, int* next_index, int* neighbors, cell* cells);
+static void GetRandomNeighbor(MazeContext* mazeContext, cell* cells);
 
-static bool contains(int value, int array_size);
+static bool ContainsLoop(MazeContext* mazeContext);
 
 #endif

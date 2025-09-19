@@ -13,12 +13,15 @@ extern "C" {
     #include <WilsonMaze.h>
 }
 
-#define WINDOW_WIDTH 840
-#define WINDOW_HEIGHT 840
+#define WINDOW_WIDTH 800 + (GRID_PADDING_SIZE * 2)
+#define WINDOW_HEIGHT 800 + (GRID_PADDING_SIZE * 2)
 
-static SDL_Window* window = NULL;
-static SDL_Renderer* renderer = NULL;
-cell* cells = NULL;
+typedef struct AppContext {
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    ImDrawData *data;
+    cell* cells;
+} AppContext;
 
 // THIS FUNCTION RUNS ONCE AT STARTUP
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
@@ -30,15 +33,21 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_APP_FAILURE;
     }
 
-    if (!SDL_CreateWindowAndRenderer("Maze Generation", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
+    // SETUP APP STATE
+    AppContext* appContext = (AppContext*) SDL_malloc(sizeof(AppContext));
+    appContext->cells = (cell*) malloc(GRID_ARRAY_SIZE * sizeof(cell));
+    if (appContext == NULL) {
+        SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Error %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+    *appstate = appContext;
+
+    if (!SDL_CreateWindowAndRenderer("Maze Generation", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &appContext->window, &appContext->renderer)) {
         SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Error %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    if(cells == NULL) {
-        cells = (cell*) malloc(GRID_ARRAY_SIZE * sizeof(cell));
-    }
-
+    // SETUP IMGUI
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -46,38 +55,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     io.LogFilename = NULL;
     ImGui::StyleColorsDark();
 
-    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
-    ImGui_ImplSDLRenderer3_Init(renderer);
+    ImGui_ImplSDL3_InitForSDLRenderer(appContext->window, appContext->renderer);
+    ImGui_ImplSDLRenderer3_Init(appContext->renderer);
 
     // CREATE/DRAW GRID
-    CreateGrid(renderer, cells);
+    CreateGrid(appContext->renderer, appContext->cells);
     
-    /*********************************************************************/
-    SDL_Log("Generating New Maze...");    
-    int* remaining = (int*) malloc(sizeof(int));
-    Allocate_WilsonMaze(remaining, cells);
-    // ITERATE THROUGH WILSON MAZE
-    bool iterate = true;
-    while(iterate) {
-        iterate = Iterate_WilsonMaze(remaining, renderer, cells);
-        SDL_SetRenderDrawColor(renderer, 30, 30, 30, SDL_ALPHA_OPAQUE_FLOAT);
-        SDL_RenderClear(renderer);
-        DrawGrid(renderer, cells);
-        SDL_RenderPresent(renderer);
-    };
-    Free_WilsonMaze();
-    free(remaining);
-    
-    // SET BACKGROUND COLOR
-    SDL_SetRenderDrawColor(renderer, 30, 30, 30, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_RenderClear(renderer);
-
-    // DRAW CURRENT GRID
-    DrawGrid(renderer, cells);
-
-    SDL_RenderPresent(renderer);
-    /*********************************************************************/
-
     return SDL_APP_CONTINUE;
 }
 
@@ -95,34 +78,46 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event* event) {
 
 // THIS FUNCTION RUNS ONCE PER FRAME
 SDL_AppResult SDL_AppIterate(void *appstate) {
-    // ImGui_ImplSDLRenderer3_NewFrame();
-    // ImGui_ImplSDL3_NewFrame();
-    // ImGui::NewFrame();
+    AppContext* appContext = (AppContext*) appstate;
 
-    // ImGui::Begin("Another Window");
-    // if (ImGui::Button("Generate Maze")) {
-    //     SDL_Log("Generating Maze...");
-    // }
-    // ImGui::End();
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
 
-    // // RENDERING
-    // ImGui::Render();
-    // SDL_RenderClear(renderer);
-    // SDL_SetRenderDrawColor(renderer, 30, 30, 30, SDL_ALPHA_OPAQUE_FLOAT);
-    // ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
-    // SDL_RenderPresent(renderer);
+    ImGui::Begin("Control Panel", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+    if (ImGui::Button("Generate Maze", ImVec2(120, 20))) {
+        SDL_Log("Generating New Maze...");
+        MazeContext *mazeContext = Init_WilsonMaze(appContext->cells);
+        while(Continue_WilsonMaze(mazeContext, appContext->renderer, appContext->cells)) {
+            // RENDERING EACH WILSON'S ALGORITHM WALK ITERATION
+            DrawGrid(appContext->renderer, appContext->cells);
+            ImGui_ImplSDLRenderer3_RenderDrawData(appContext->data, appContext->renderer);
+            SDL_RenderPresent(appContext->renderer);
+        }
+        free(mazeContext);
+    }
+    ImGui::End();
+
+    // RENDERING
+    ImGui::Render();
+    DrawGrid(appContext->renderer, appContext->cells);
+    appContext->data = ImGui::GetDrawData();
+    ImGui_ImplSDLRenderer3_RenderDrawData(appContext->data, appContext->renderer);
+    SDL_RenderPresent(appContext->renderer);
     
     return SDL_APP_CONTINUE;
 }
 
 void SDL_AppQuit(void* appstate, SDL_AppResult result) {
+    AppContext* appContext = (AppContext*) appstate;
+
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(appContext->renderer);
+    SDL_DestroyWindow(appContext->window);
     SDL_Quit();
 
-    free(cells);
+    SDL_free(appContext);
 }
