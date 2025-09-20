@@ -70,9 +70,20 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
 // THIS FUNCTION RUNS WHEN A NEW EVENT OCCURS (MOUSE INPUT, KEY PRESS, ETC.)
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event* event) {
+    AppContext* appContext = (AppContext*) appstate;
+    
     switch (event->type) {
         case SDL_EVENT_QUIT:
             return SDL_APP_SUCCESS;
+        case SDL_EVENT_KEY_DOWN:
+            switch(event->key.key) {
+                case SDLK_ESCAPE:
+                    return SDL_APP_SUCCESS;
+                case SDLK_KP_ENTER:
+                case SDLK_RETURN:
+                    appContext->mazeContext = Init_WilsonMaze(appContext->cells);
+                    appContext->isRunning = true;
+            }
     }
 
     ImGui_ImplSDL3_ProcessEvent(event);
@@ -90,9 +101,10 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     ImGui::Begin("Control Panel", NULL, ImGuiWindowFlags_AlwaysAutoResize);
     if (ImGui::Button("Generate Maze", ImVec2(120, 20))) {
-        SDL_Log("Generating New Maze...");
-        appContext->mazeContext = Init_WilsonMaze(appContext->cells);
-        appContext->isRunning = true;
+        if(!appContext->isRunning) {
+            appContext->mazeContext = Init_WilsonMaze(appContext->cells);
+            appContext->isRunning = true;
+        }
     }
     ImGui::End();
 
