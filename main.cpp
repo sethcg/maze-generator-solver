@@ -22,6 +22,7 @@ typedef struct AppContext {
     ImDrawData *data;
 
     bool isRunning;
+    bool hasMaze;
     MazeContext* mazeContext;
     cell* cells;
 } AppContext;
@@ -40,6 +41,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     AppContext* appContext = (AppContext*) SDL_malloc(sizeof(AppContext));
     appContext->cells = (cell*) malloc(GRID_ARRAY_SIZE * sizeof(cell));
     appContext->isRunning = false;
+    appContext->hasMaze = false;
     if (appContext == NULL) {
         SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Error %s", SDL_GetError());
         return SDL_APP_FAILURE;
@@ -79,10 +81,13 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event* event) {
             switch(event->key.key) {
                 case SDLK_ESCAPE:
                     return SDL_APP_SUCCESS;
-                case SDLK_KP_ENTER:
-                case SDLK_RETURN:
+                case SDLK_KP_BACKSPACE:
+                case SDLK_BACKSPACE:
                     appContext->mazeContext = Init_WilsonMaze(appContext->cells);
                     appContext->isRunning = true;
+                case SDLK_KP_ENTER:
+                case SDLK_RETURN:
+                    SDL_Log("Solving..");
             }
     }
 
@@ -99,11 +104,16 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Control Panel", NULL, ImGuiWindowFlags_AlwaysAutoResize);
-    if (ImGui::Button("Generate Maze", ImVec2(120, 20))) {
+    ImGui::Begin("Control Panel", NULL, ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoCollapse);
+    if (ImGui::Button("Generate", ImVec2(120, 20))) {
         if(!appContext->isRunning) {
             appContext->mazeContext = Init_WilsonMaze(appContext->cells);
             appContext->isRunning = true;
+        }
+    }
+    if (ImGui::Button("Solve", ImVec2(120, 20))) {
+        if(!appContext->isRunning) {
+            SDL_Log("Solving..");
         }
     }
     ImGui::End();
@@ -112,6 +122,8 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     if(appContext->isRunning) {
         if(!Continue_WilsonMaze(appContext->mazeContext, appContext->cells)) {
             appContext->isRunning = false;
+            appContext->hasMaze = true;
+            SDL_Log("Maze generation complete.");
             free(appContext->mazeContext);
         }
     }
