@@ -1,13 +1,8 @@
-#ifndef MAZE_H
-#define MAZE_H
+#ifndef WILSON_MAZE_H
+#define WILSON_MAZE_H
 
 #include <SDL3/SDL.h>
 #include <Cell.h>
-
-typedef struct {
-    int cell_index;
-    direction dir;
-} cell_direction;
 
 typedef struct MazeContext {
     int remaining;

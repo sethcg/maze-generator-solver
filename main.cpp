@@ -11,6 +11,7 @@
 extern "C" {
     #include <Grid.h>
     #include <WilsonMaze.h>
+    #include <AStarPathfinding.h>
 }
 
 #define WINDOW_WIDTH 800 + (GRID_PADDING_SIZE * 2)
@@ -24,6 +25,7 @@ typedef struct AppContext {
     bool isRunning;
     bool hasMaze;
     MazeContext* mazeContext;
+    PathContext* pathContext;
     cell* cells;
 } AppContext;
 
@@ -114,6 +116,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     if (ImGui::Button("Solve", ImVec2(120, 20))) {
         if(!appContext->isRunning) {
             SDL_Log("Solving..");
+            appContext->pathContext = Init_AStarPathfinding(0, (GRID_ARRAY_SIZE - 1), appContext->cells);
         }
     }
     ImGui::End();

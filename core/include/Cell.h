@@ -18,6 +18,11 @@ typedef struct {
     bool visited;
 } cell;
 
+typedef struct {
+    int cell_index;
+    direction dir;
+} cell_direction;
+
 #define create_cell() { .visited = false, .borders = (uint8_t) 0b1111 };
 
 #endif
