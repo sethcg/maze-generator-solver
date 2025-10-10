@@ -42,23 +42,12 @@ PathContext* AStarPathfinding(PathContext* pathContext, cell* cells) {
     int open_index = 1;
     int closed_index = 0;
 
-    int test_close_score[GRID_ARRAY_SIZE];
-    int test_closed[GRID_ARRAY_SIZE];
-    direction test_close_dir[GRID_ARRAY_SIZE];
-    for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
-        test_closed[i] = -1;
-        test_close_score[i] = -1;
-        test_close_dir[i] = None;
-    }
-
     while(open_index > 0) {
         // LET THE CURRENT NODE EQUAL THE NODE WITH THE LOWEST 'F' VALUE
         pathContext->current_node = pathContext->openSet[0];
         int remove_index = 0;
         for(int i = 0; i < open_index; i++) {
-            int new_f = pathContext->openSet[i].f_score;
-            int current_f = pathContext->current_node.f_score;
-            if(new_f >= 0 && current_f >= 0 &&  new_f < current_f) {
+            if(pathContext->openSet[i].f_score < pathContext->current_node.f_score) {
                 pathContext->current_node = pathContext->openSet[i];
                 remove_index = i;
             }
@@ -71,7 +60,7 @@ PathContext* AStarPathfinding(PathContext* pathContext, cell* cells) {
         open_index--;
 
         // ADD THE CURRENT NODE TO THE CLOSED SET
-        // SET THE DIRECTION TO THE OPPOSITE, FOR BACKTRACKING
+        // SET THE DIRECTION TO THE OPPOSITE, FOR BACKTRACKING PURPOSES
         pathContext->closedSet[closed_index].dir = closed_index == pathContext->start ? None 
             : pathContext->current_node.dir == Up ? Down
             : pathContext->current_node.dir == Down ? Up
@@ -80,15 +69,6 @@ PathContext* AStarPathfinding(PathContext* pathContext, cell* cells) {
             : None;
         pathContext->closedSet[closed_index].cell_index = pathContext->current_node.cell_index;
         pathContext->closedSet[closed_index].g_score = pathContext->current_node.g_score;
-
-        test_close_dir[closed_index] = closed_index == pathContext->start ? None 
-            : pathContext->current_node.dir == Up ? Down
-            : pathContext->current_node.dir == Down ? Up
-            : pathContext->current_node.dir == Right ? Left
-            : pathContext->current_node.dir == Left ? Right
-            : None;
-        test_close_score[closed_index] = pathContext->current_node.g_score;
-        test_closed[closed_index] = pathContext->current_node.cell_index;
         closed_index++;
 
         // IF CURRENT INDEX EQUALS END INDEX, EXIT

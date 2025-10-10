@@ -114,8 +114,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
         }
     }
     if (ImGui::Button("Solve", ImVec2(120, 20))) {
-        if(!appContext->isRunning) {
-            SDL_Log("Solving..");
+        if(appContext->hasMaze && !appContext->isRunning) {
             appContext->pathContext = Init_AStarPathfinding(0, (GRID_ARRAY_SIZE - 1), appContext->cells);
         }
     }
@@ -126,7 +125,6 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
         if(!Continue_WilsonMaze(appContext->mazeContext, appContext->cells)) {
             appContext->isRunning = false;
             appContext->hasMaze = true;
-            SDL_Log("Maze generation complete.");
             free(appContext->mazeContext);
         }
     }
