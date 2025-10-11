@@ -110,6 +110,7 @@ PathContext* AStarPathfinding(PathContext* pathContext, cell* cells) {
 
 PathContext* BacktrackPath(PathContext* pathContext, cell* cells) {
     // GET THE POSITION OF THE END INDEX
+    int path_size = 0;
     int current_position = -1;
     for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
         if(pathContext->closedSet[i].cell_index == pathContext->end) {
@@ -117,23 +118,19 @@ PathContext* BacktrackPath(PathContext* pathContext, cell* cells) {
             break;
         }
     }
-
-    int path[GRID_ARRAY_SIZE];
-    for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
-        path[i] = -1;
-    }
-    path[0] = pathContext->end;
-    int running_index = 1;
+    cells[pathContext->end].path_cell = true;
+    cells[pathContext->start].path_cell = true;
 
     // BACKTRACK THROUGH THE INDICES/DIRECTIONS
     while(current_position > 0) {
         direction current_dir = pathContext->closedSet[current_position].dir;
-        int current = pathContext->closedSet[current_position].cell_index;
+        int current_index = pathContext->closedSet[current_position].cell_index;   
+        
         int next_index = 
-            current_dir == Up ? current - 1 :
-            current_dir == Down ? current + 1 :
-            current_dir == Left ? current - GRID_ROWS :
-            current_dir == Right ? current + GRID_ROWS :
+            current_dir == Up ? current_index - 1 :
+            current_dir == Down ? current_index + 1 :
+            current_dir == Left ? current_index - GRID_ROWS :
+            current_dir == Right ? current_index + GRID_ROWS :
             None;
 
         // RECALCULATE THE CURRENT ARRAY POSITION
@@ -144,9 +141,34 @@ PathContext* BacktrackPath(PathContext* pathContext, cell* cells) {
             }
         }
 
-        // ADD CELL INDEX TO PATH
-        path[running_index] = next_index;
-        running_index++;
+        // FLAG THE CELL AS BEING PART OF THE PATH
+        cells[next_index].path_cell = true;
+        path_size++;
+    }
+
+    // ADD GRADIENT TO EACH PATH STEP
+    rgb_color start_color = create_rgb_color(255, 0, 0);
+    rgb_color end_color = create_rgb_color(0, 255, 0);
+
+    cells[pathContext->start].path_gradient = start_color;
+    cells[pathContext->end].path_gradient = end_color;
+
+    float step_r = (float)(end_color.r - start_color.r) / (float) path_size;
+    float step_g = (float)(end_color.g - start_color.g) / (float) path_size;
+    float step_b = (float)(end_color.b - start_color.b) / (float) path_size;
+
+    int path_position = 0;
+    for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
+        int current_index = pathContext->closedSet[i].cell_index;
+        if(cells[current_index].path_cell) {
+            // ADD THE PATH GRADIENT COLOR TO THE CELL
+            int r = start_color.r + (path_position * step_r); 
+            int g = start_color.g + (path_position * step_g);
+            int b = start_color.b + (path_position * step_b);
+            rgb_color current_color = create_rgb_color(r, g, b);
+            cells[current_index].path_gradient = current_color;
+            path_position++;
+        }
     }
 
     return pathContext;

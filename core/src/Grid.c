@@ -44,7 +44,6 @@ void DrawGrid(SDL_Renderer *renderer, cell* cells) {
             DrawBorder(renderer, cells, x, y);
 
             // DRAW CELL SQUARE
-            SDL_SetRenderDrawColor(renderer, 50, 50, 50, SDL_ALPHA_OPAQUE_FLOAT);
             DrawSquare(renderer, cells, x, y);
         }
     }
@@ -110,5 +109,24 @@ static void DrawSquare(SDL_Renderer *renderer, cell* cells, int x, int y) {
         .y = cells[index].start_y + GRID_CELL_BORDER_SIZE, 
         .w = square_size, .h = square_size
     };
+    SDL_SetRenderDrawColor(renderer, 50, 50, 50, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_RenderFillRect(renderer, &inner_square);
+
+    // TODO: IMPROVE THE WAY THAT THE PATH IS DISPLAYED TO THE USER
+    if(cells[index].path_cell) {
+        const int path_square_size = ((cells[index].size - GRID_CELL_BORDER_SIZE) / 4) - GRID_CELL_BORDER_SIZE;
+        const int path_square_offset = ((cells[index].size - GRID_CELL_BORDER_SIZE) - path_square_size) / 2;
+        SDL_FRect path_square = { 
+            .x = cells[index].start_x + GRID_CELL_BORDER_SIZE + path_square_offset,
+            .y = cells[index].start_y + GRID_CELL_BORDER_SIZE + path_square_offset,
+            .w = path_square_size, .h = path_square_size
+        };
+        
+        int r = cells[index].path_gradient.r;
+        int g = cells[index].path_gradient.g;
+        int b = cells[index].path_gradient.b;
+
+        SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(renderer, &path_square);
+    }
 }

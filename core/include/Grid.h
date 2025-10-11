@@ -4,8 +4,8 @@
 #include <SDL3/SDL.h>
 #include <Cell.h>
 
-#define GRID_ROWS 4
-#define GRID_COLUMNS 4
+#define GRID_ROWS 25
+#define GRID_COLUMNS 25
 #define GRID_ARRAY_SIZE (GRID_ROWS * GRID_COLUMNS)
 
 #define GRID_CELL_SIZE 28
