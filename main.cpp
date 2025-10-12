@@ -89,7 +89,9 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event* event) {
                     appContext->isRunning = true;
                 case SDLK_KP_ENTER:
                 case SDLK_RETURN:
-                    SDL_Log("Solving..");
+                    if(appContext->hasMaze && !appContext->isRunning) {
+                        appContext->pathContext = Init_AStarPathfinding(0, (GRID_ARRAY_SIZE - 1), appContext->cells);
+                    }
             }
     }
 

@@ -15,6 +15,7 @@ MazeContext* Init_WilsonMaze(cell* cells) {
 
     // INITIALIZE GRID, WITH ALL BORDERS AND UNVISITED
     for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
+        cells[i].path_cell = false;
         cells[i].visited = false;
         cells[i].borders = (uint8_t) 0b1111;
     }
