@@ -118,6 +118,29 @@ PathContext* BacktrackPath(PathContext* pathContext, cell* cells) {
             break;
         }
     }
+
+    // ADD GRADIENT TO EACH PATH STEP
+    rgb_color start_color = create_rgb_color(255, 0, 0);
+    rgb_color end_color = create_rgb_color(0, 255, 0);
+    
+    int max_g_score = pathContext->closedSet[current_position].g_score;
+    float step_r = (float)(end_color.r - start_color.r) / (float) max_g_score;
+    float step_g = (float)(end_color.g - start_color.g) / (float) max_g_score;
+    float step_b = (float)(end_color.b - start_color.b) / (float) max_g_score;
+
+    for(int i = 0; i < current_position; i++) {
+        int current_index = pathContext->closedSet[i].cell_index;
+
+        // ADD THE PATH GRADIENT COLOR TO THE CELL
+        int r = start_color.r + (pathContext->closedSet[i].g_score * step_r); 
+        int g = start_color.g + (pathContext->closedSet[i].g_score * step_g);
+        int b = start_color.b + (pathContext->closedSet[i].g_score * step_b);
+
+        rgb_color current_color = create_rgb_color(r, g, b);
+        cells[current_index].path_gradient = current_color;
+        cells[current_index].gradient_cell = true;
+    }
+
     cells[pathContext->end].path_cell = true;
     cells[pathContext->start].path_cell = true;
 
@@ -146,28 +169,12 @@ PathContext* BacktrackPath(PathContext* pathContext, cell* cells) {
         path_size++;
     }
 
-    // ADD GRADIENT TO EACH PATH STEP
-    rgb_color start_color = create_rgb_color(255, 0, 0);
-    rgb_color end_color = create_rgb_color(0, 255, 0);
-
-    cells[pathContext->start].path_gradient = start_color;
-    cells[pathContext->end].path_gradient = end_color;
-
-    float step_r = (float)(end_color.r - start_color.r) / (float) path_size;
-    float step_g = (float)(end_color.g - start_color.g) / (float) path_size;
-    float step_b = (float)(end_color.b - start_color.b) / (float) path_size;
-
-    int path_position = 0;
+    // SHOW SHORTEST PATH IN DIFFERENT COLOR
     for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
-        int current_index = pathContext->closedSet[i].cell_index;
-        if(cells[current_index].path_cell) {
-            // ADD THE PATH GRADIENT COLOR TO THE CELL
-            int r = start_color.r + (path_position * step_r); 
-            int g = start_color.g + (path_position * step_g);
-            int b = start_color.b + (path_position * step_b);
-            rgb_color current_color = create_rgb_color(r, g, b);
-            cells[current_index].path_gradient = current_color;
-            path_position++;
+        int path_index = pathContext->closedSet[i].cell_index;
+        if(cells[path_index].path_cell) {
+            rgb_color path_color = create_rgb_color(0, 0, 0);
+            cells[path_index].path_gradient = path_color;
         }
     }
 

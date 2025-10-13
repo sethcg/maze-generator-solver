@@ -112,8 +112,8 @@ static void DrawSquare(SDL_Renderer *renderer, cell* cells, int x, int y) {
     SDL_SetRenderDrawColor(renderer, 50, 50, 50, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_RenderFillRect(renderer, &inner_square);
 
-    // TODO: IMPROVE THE WAY THAT THE PATH IS DISPLAYED TO THE USER
-    if(cells[index].path_cell) {
+    // TODO: IMPROVE THE WAY THAT THE PATH/GRADIENT IS DISPLAYED TO THE USER
+    if(cells[index].gradient_cell || cells[index].path_cell) {
         const int path_square_size = ((cells[index].size - GRID_CELL_BORDER_SIZE) / 4) - GRID_CELL_BORDER_SIZE;
         const int path_square_offset = ((cells[index].size - GRID_CELL_BORDER_SIZE) - path_square_size) / 2;
         SDL_FRect path_square = { 

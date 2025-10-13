@@ -31,9 +31,10 @@ typedef struct {
     bool visited;
 
     bool path_cell;
+    bool gradient_cell;
     rgb_color path_gradient;
 } cell;
 
-#define create_cell() { .visited = false, .borders = (uint8_t) 0b1111, .path_cell = false };
+#define create_cell() { .visited = false, .borders = (uint8_t) 0b1111, .path_cell = false, .gradient_cell = false};
 
 #endif

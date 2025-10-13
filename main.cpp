@@ -108,7 +108,8 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Control Panel", NULL, ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoCollapse);
+    ImGui::SetNextWindowSize(ImVec2(136, 0));
+    ImGui::Begin("Control Panel", NULL, ImGuiWindowFlags_NoCollapse);
     if (ImGui::Button("Generate", ImVec2(120, 20))) {
         if(!appContext->isRunning) {
             appContext->mazeContext = Init_WilsonMaze(appContext->cells);
