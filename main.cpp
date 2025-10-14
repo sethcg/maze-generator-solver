@@ -25,7 +25,9 @@ typedef struct AppContext {
     bool isRunning;
     bool hasMaze;
     MazeContext* mazeContext;
-    PathContext* pathContext;
+    bool showPath;
+    bool showGradient;
+    PathContext* pathContext;  
     cell* cells;
 } AppContext;
 
@@ -44,6 +46,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     appContext->cells = (cell*) malloc(GRID_ARRAY_SIZE * sizeof(cell));
     appContext->isRunning = false;
     appContext->hasMaze = false;
+    appContext->showPath = true;
+    appContext->showGradient = false;
     if (appContext == NULL) {
         SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Error %s", SDL_GetError());
         return SDL_APP_FAILURE;
@@ -121,6 +125,10 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
             appContext->pathContext = Init_AStarPathfinding(0, (GRID_ARRAY_SIZE - 1), appContext->cells);
         }
     }
+
+    ImGui::Checkbox("Path", &appContext->showPath);
+    ImGui::Checkbox("Gradient", &appContext->showGradient);
+
     ImGui::End();
 
     // RENDERING EACH WILSON'S ALGORITHM WALK ITERATION
@@ -128,13 +136,12 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
         if(!Continue_WilsonMaze(appContext->mazeContext, appContext->cells)) {
             appContext->isRunning = false;
             appContext->hasMaze = true;
-            free(appContext->mazeContext);
         }
     }
 
     // RENDERING
     ImGui::Render();
-    DrawGrid(appContext->renderer, appContext->cells);
+    DrawGrid(appContext->renderer, appContext->cells, appContext->showPath, appContext->showGradient);
     appContext->data = ImGui::GetDrawData();
     ImGui_ImplSDLRenderer3_RenderDrawData(appContext->data, appContext->renderer);
     SDL_RenderPresent(appContext->renderer);

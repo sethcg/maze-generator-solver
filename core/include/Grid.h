@@ -18,10 +18,10 @@
 
 void CreateGrid(SDL_Renderer *renderer, cell* cells);
 
-void DrawGrid(SDL_Renderer *renderer, cell* cells);
+void DrawGrid(SDL_Renderer *renderer, cell* cells, bool show_path, bool show_gradient);
 
 static void DrawBorder(SDL_Renderer *renderer, cell* cells, int x, int y);
 
-static void DrawSquare(SDL_Renderer *renderer, cell* cells, int x, int y);
+static void DrawSquare(SDL_Renderer *renderer, cell* cells, int x, int y, bool show_path, bool show_gradient);
 
 #endif

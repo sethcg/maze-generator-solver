@@ -119,7 +119,7 @@ PathContext* BacktrackPath(PathContext* pathContext, cell* cells) {
         }
     }
 
-    // ADD GRADIENT TO EACH PATH STEP
+    // ADD GRADIENT TO EACH VISITED CELL
     rgb_color start_color = create_rgb_color(255, 0, 0);
     rgb_color end_color = create_rgb_color(0, 255, 0);
     
@@ -128,10 +128,9 @@ PathContext* BacktrackPath(PathContext* pathContext, cell* cells) {
     float step_g = (float)(end_color.g - start_color.g) / (float) max_g_score;
     float step_b = (float)(end_color.b - start_color.b) / (float) max_g_score;
 
-    for(int i = 0; i < current_position; i++) {
+    for(int i = 0; i <= current_position; i++) {
         int current_index = pathContext->closedSet[i].cell_index;
 
-        // ADD THE PATH GRADIENT COLOR TO THE CELL
         int r = start_color.r + (pathContext->closedSet[i].g_score * step_r); 
         int g = start_color.g + (pathContext->closedSet[i].g_score * step_g);
         int b = start_color.b + (pathContext->closedSet[i].g_score * step_b);
@@ -144,7 +143,7 @@ PathContext* BacktrackPath(PathContext* pathContext, cell* cells) {
     cells[pathContext->end].path_cell = true;
     cells[pathContext->start].path_cell = true;
 
-    // BACKTRACK THROUGH THE INDICES/DIRECTIONS
+    // BACKTRACK THROUGH THE INDICES/DIRECTIONS TO DEFINE THE PATH
     while(current_position > 0) {
         direction current_dir = pathContext->closedSet[current_position].dir;
         int current_index = pathContext->closedSet[current_position].cell_index;   
@@ -168,16 +167,7 @@ PathContext* BacktrackPath(PathContext* pathContext, cell* cells) {
         cells[next_index].path_cell = true;
         path_size++;
     }
-
-    // SHOW SHORTEST PATH IN DIFFERENT COLOR
-    for(int i = 0; i < GRID_ARRAY_SIZE; i++) {
-        int path_index = pathContext->closedSet[i].cell_index;
-        if(cells[path_index].path_cell) {
-            rgb_color path_color = create_rgb_color(0, 0, 0);
-            cells[path_index].path_gradient = path_color;
-        }
-    }
-
+    
     return pathContext;
 }
 
