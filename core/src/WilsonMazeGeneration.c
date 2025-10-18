@@ -5,7 +5,7 @@
 #include <SDL3/SDL.h>
 #include <Grid.h>
 #include <Cell.h>
-#include <WilsonMaze.h>
+#include <WilsonMazeGeneration.h>
 
 MazeContext* Init_WilsonMaze(cell* cells) {
     MazeContext* mazeContext = (MazeContext*) malloc(sizeof(MazeContext));

@@ -13,8 +13,8 @@
 
 #define GRID_PADDING_SIZE 20
 
-#define GRID_SQUARE_COLOR 50    // GRID SQUARE COLOR: [0-255]
-#define GRID_BORDER_COLOR 0     // GRID BORDER COLOR: [0-255]
+#define GRID_SQUARE_COLOR 50    // GRID SQUARE COLOR NUMBER: [0-255]
+#define GRID_BORDER_COLOR 0     // GRID BORDER COLOR NUMBER: [0-255]
 
 void CreateGrid(SDL_Renderer *renderer, cell* cells);
 

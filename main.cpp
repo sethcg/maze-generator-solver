@@ -10,7 +10,7 @@
 
 extern "C" {
     #include <Grid.h>
-    #include <WilsonMaze.h>
+    #include <WilsonMazeGeneration.h>
     #include <AStarPathfinding.h>
 }
 
@@ -25,6 +25,7 @@ typedef struct AppContext {
     bool isRunning;
     bool hasMaze;
     MazeContext* mazeContext;
+
     bool showPath;
     bool showGradient;
     PathContext* pathContext;  
